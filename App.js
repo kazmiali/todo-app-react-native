@@ -1,40 +1,69 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    Button,
+    TextInput,
+    FlatList,
+} from 'react-native';
+
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 const App = () => {
-    const [text, setText] = useState(
-        'Open up App.js to start working on your app!',
-    );
+    const [courseGoals, setCourseGoals] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleText = () => {
-        setText('New text is here');
-        setTimeout(() => {
-            setText('another text');
-        }, 2000);
+    const addGoalHandler = goal => {
+        if (goal.length === 0) {
+            return;
+        }
+        setCourseGoals(currentGoals => [
+            ...currentGoals,
+            { id: Math.random().toString(), value: goal },
+        ]);
+        cancelModal();
     };
+
+    const removeGoalHandler = goalId => {
+        setCourseGoals(currentGoals => {
+            return currentGoals.filter(item => item.id !== goalId);
+        });
+    };
+
+    const cancelModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <View style={styles.container}>
-            <Text>{text}</Text>
-            <Button
-                style={styles.button}
-                onPress={handleText}
-                title='Click to change Text'
-            ></Button>
+        <View style={styles.screen}>
+            <Button title='Add New Goal' onPress={() => setIsModalOpen(true)} />
+            <GoalInput
+                isModalOpen={isModalOpen}
+                addGoalHandler={addGoalHandler}
+                cancelModal={cancelModal}
+            />
+            <FlatList
+                data={courseGoals}
+                renderItem={itemData => (
+                    <GoalItem
+                        id={itemData.item.id}
+                        value={itemData.item.value}
+                        removeGoalHandler={removeGoalHandler}
+                    />
+                )}
+            />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    screen: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#333',
         alignItems: 'center',
-        justifyContent: 'center',
-    },
-    button: {
-        padding: '22px',
-        color: 'white',
-        backgroundColor: 'red',
+        padding: 30,
     },
 });
 
